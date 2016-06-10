@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>common configurations</comment>
+    <entry key="use_gui">true</entry>
+    <entry key="tag">DaCapo</entry>
+    <entry key="app_conf_file">conf.xml</entry>
+    <entry key="report_text_title">Benchmark Results</entry>
+    <comment>button actions configurations</comment>
+    <entry key="app_buttons">btnr_lusearch,btnr_xalan,btnr_pmd,btnr_sqlite</entry>
+    <entry key="clzz_default_button">etalon.purdue.edu.base.ui.GenericBtnActionImpl</entry>  
+    <entry key="action_btnr_lusearch">etalon.purdue.edu.dacapo.ui.LunchAction</entry>
+    <entry key="action_btnr_xalan">etalon.purdue.edu.dacapo.ui.LunchAction</entry>
+    <entry key="action_btnr_pmd">etalon.purdue.edu.dacapo.ui.LunchAction</entry>
+    <entry key="action_btnr_sqlite">etalon.purdue.edu.dacapo.ui.LunchAction</entry>
+    <entry key="label_btnr_lusearch">lusearch</entry>
+    <entry key="label_btnr_xalan">xalan</entry>
+    <entry key="label_btnr_pmd">pmd</entry>
+    <entry key="label_btnr_sqlite">sqlite</entry>
+    
+    
+    <entry key="signal_buttons">btnr_sigusr1,btnr_quit</entry>
+    <entry key="action_btnr_quit">etalon.purdue.edu.base.ui.SignalAppBtnAction</entry>
+    <entry key="action_btnr_sigusr1">etalon.purdue.edu.base.ui.SignalAppBtnAction</entry>    
+    <entry key="sig_btnr_quit">SIGNAL_KILL</entry>
+    <entry key="sig_btnr_sigusr1">SIGNAL_USR1</entry>
+    
+    <entry key="clzz_button_json_parser">bifrost.edu.actions.GenButtonActionImpl</entry>
+    <entry key="clzz_button_json_serializer">bifrost.edu.actions.GenButtonActionImpl</entry>    
+    <comment>workload size</comment>
+    <entry key="inner_iterations">1</entry>
+    <entry key="speed00">workload00</entry>
+    <entry key="speed01">workload01</entry>
+    <entry key="speed02">workload02</entry>
+    <entry key="speed">workload01</entry>
+    <entry key="iterations">10</entry>
+</properties>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--language=SQLite-->
+    <string name="insert_account">
+        INSERT INTO accounts (Aid, Bid, Abalance) VALUES (?, ?, 0);
+    </string>
+
+    <!--language=SQLite-->
+    <string name="update_user_name_by_age">
+        UPDATE users SET name = ?
+        WHERE age = ?;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="update_account_by_aid">
+        UPDATE accounts
+        SET     Abalance = Abalance + ?
+        WHERE   Aid = ?;
+    </string>
+
+
+    <!--language=SQLite-->
+    <string name="select_account_by_aid">
+        SELECT
+             *
+        FROM accounts
+        WHERE   Aid = ?;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="select_users_by_age">
+        SELECT
+            *
+        FROM users
+        WHERE age = ?;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="select_all_users">
+        SELECT
+            *
+        FROM accounts;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="drop_table_account">
+        DROP TABLE IF EXISTS accounts;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="delete_all_accounts">
+        DELETE FROM accounts;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="create_table_account">
+        CREATE TABLE accounts (
+            Aid         INTEGER NOT NULL PRIMARY KEY,
+            Bid         INTEGER,
+            Abalance    INTEGER,
+            filler      CHAR(84)
+        );
+    </string>
+
+
+
+
+    <!--language=SQLite-->
+    <string name="insert_teller">
+        INSERT INTO tellers(Tid,Bid,Tbalance) VALUES (?,?,0);
+    </string>
+    <!--language=SQLite-->
+    <string name="select_all_tellers">
+        SELECT
+            *
+        FROM users;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="drop_table_teller">
+        DROP TABLE IF EXISTS tellers;
+    </string>
+
+
+    <!--language=SQLite-->
+    <string name="delete_all_tellers">
+        DELETE FROM tellers;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="create_table_teller">
+        CREATE TABLE tellers (
+            Tid         INTEGER NOT NULL PRIMARY KEY,
+            Bid         INTEGER,
+            Tbalance    INTEGER,
+            filler      CHAR(84));
+    </string>
+
+
+
+    <string name="update_teller_balance_by_tid">
+        UPDATE tellers
+        SET     Tbalance = Tbalance + ?
+        WHERE   Tid = ?;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="insert_history">
+        INSERT INTO history (Tid, Bid, Aid, delta) VALUES (?,?,?,?);
+    </string>
+    <!--language=SQLite-->
+    <string name="select_all_history">
+        SELECT
+            *
+        FROM history;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="drop_table_history">
+        DROP TABLE IF EXISTS history;
+    </string>
+
+
+    <!--language=SQLite-->
+    <string name="delete_all_history">
+        DELETE FROM history;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="create_table_history">
+        CREATE TABLE history (
+            Tid         INTEGER,
+            Bid         INTEGER,
+            Aid         INTEGER,
+            delta       INTEGER,
+            tstime        TIMESTAMP,
+            filler      CHAR(22));
+    </string>
+
+
+    <!--language=SQLite-->
+    <string name="insert_branche">
+        INSERT INTO branchestable(Bid,Bbalance) VALUES (?,0);
+    </string>
+    <!--language=SQLite-->
+    <string name="select_all_branche">
+        SELECT
+            *
+        FROM branchestable;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="drop_table_branche">
+        DROP TABLE IF EXISTS branchestable;
+    </string>
+
+
+    <!--language=SQLite-->
+    <string name="delete_all_branche">
+        DELETE FROM branchestable;
+    </string>
+
+    <!--language=SQLite-->
+    <string name="create_table_branche">
+        CREATE TABLE  branchestable (
+            Bid         INTEGER NOT NULL PRIMARY KEY,
+            Bbalance    INTEGER,
+            filler      CHAR(88));
+    </string>
+
+
+    <string name="update_branch_balance_by_bid">
+        UPDATE branchestable
+        SET     Bbalance = Bbalance + ?
+        WHERE   Bid = ?;
+    </string>
+</resources>

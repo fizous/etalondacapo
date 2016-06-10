@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="true"
+  tools:context="etalon.purdue.edu.dacapo.DaCapoActivity">
+
+  <android.support.design.widget.AppBarLayout
+    android:id="@+id/app_bar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/app_bar_height"
+    android:fitsSystemWindows="true"
+    android:theme="@style/AppTheme.AppBarOverlay">
+
+    <android.support.design.widget.CollapsingToolbarLayout
+      android:id="@+id/toolbar_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:fitsSystemWindows="true"
+      app:contentScrim="?attr/colorPrimary"
+      app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+      <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_collapseMode="pin"
+        app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+      <TableLayout
+        android:id="@+id/keypad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical" >
+        <TableRow>
+          <Button
+            android:id="@+id/btnr_lusearch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btnl_lusearch" />
+          <Button
+            android:id="@+id/btnr_pmd"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btnl_pmd" />
+          <Button
+            android:id="@+id/btnr_xalan"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btnl_xalan" />
+        </TableRow>
+        <TableRow>
+          <Button
+            android:id="@+id/btnr_sqlite"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btnl_sqlite" />
+          <Button
+            android:id="@+id/btnr_sigusr1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_btnr_sigusr1" />
+          <Button
+            android:id="@+id/btnr_quit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_btnr_quit" />
+        </TableRow>
+      </TableLayout>
+    </android.support.design.widget.CollapsingToolbarLayout>
+
+  </android.support.design.widget.AppBarLayout>
+
+
+
+  <include layout="@layout/etalon_dacapo_content"/>
+
+  <android.support.design.widget.FloatingActionButton
+    android:id="@+id/fab"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/fab_margin"
+    android:src="@android:drawable/ic_dialog_email"
+    app:layout_anchor="@id/app_bar"
+    app:layout_anchorGravity="bottom|end"/>
+
+</android.support.design.widget.CoordinatorLayout>

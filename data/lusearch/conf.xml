@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="tag">etalon_lusearch</entry>
+  <entry key="interior_id">lusearch</entry>
+  <entry key="iterations">5</entry>
+  <entry key="workload">small</entry>
+</properties>

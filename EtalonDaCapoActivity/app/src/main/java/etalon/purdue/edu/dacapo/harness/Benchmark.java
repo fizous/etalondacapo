@@ -1,0 +1,817 @@
+/*
+ * Copyright (c) 2006, 2009 The Australian National University.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0.
+ * You may obtain the license at
+ * 
+ *    http://www.opensource.org/licenses/apache2.0.php
+ */
+package etalon.purdue.edu.dacapo.harness;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+
+import etalon.purdue.edu.dacapo.parser.Config;
+
+
+/**
+ * Each DaCapo benchmark is represented by an instance of this abstract class.
+ * It defines the methods that the benchmark harness calls during the running of
+ * the benchmark.
+ * 
+ * @date $Date: 2009-12-24 11:19:36 +1100 (Thu, 24 Dec 2009) $
+ * @id $Id: Benchmark.java 738 2009-12-24 00:19:36Z steveb-oss $
+ */
+public abstract class Benchmark {
+
+	public final static boolean IGNORE_JARS = false;
+	/*
+	 * Constants
+	 */
+
+	/**
+	 * I/O buffer size for unzipping
+	 */
+	private static final int BUFFER_SIZE = 2048;
+	/**
+	 * Timeout Dialation property.
+	 */
+	private static final String TIMEOUT_DIALATION_PROPERTY = "dacapo.timeout.dialation";
+
+	/*
+	 * Class variables
+	 */
+
+	/**
+	 * Verbose output.
+	 */
+	private static boolean verbose = false;
+
+	/**
+	 * Display output from the benchmark ?
+	 */
+	private static boolean silent = true;
+
+	/**
+	 * Perform digest operations on standard output and standard error
+	 */
+	private static boolean validateOutput = true;
+
+	/**
+	 * Perform System.gc() just prior to each iteration
+	 */
+	private static boolean preIterationGC = false;
+
+	/**
+	 * Perform validation
+	 */
+	private static boolean validate = true;
+
+	/**
+	 * Don't clean up output files
+	 */
+	private static boolean preserve = false;
+
+	/**
+	 * Output file for writing digests
+	 */
+	private static PrintWriter valRepFile = null;
+
+	/**
+   *
+   */
+	private static boolean validationReport = false;
+
+	/**
+	 * Factor used to increase the timeouts used in a benchmark. Note that it's
+	 * impact is dependent on the particular benchmark utilizing this
+	 * timeout.dialation property.
+	 */
+	private static String timeoutDialation = "1";
+
+	/**
+	 * Saved System.out while redirected to the digest stream
+	 */
+	private /*static final*/ PrintStream savedOut = System.out;
+
+	/**
+	 * Saved System.err while redirected to the digest stream
+	 */
+	private /*static final*/ PrintStream savedErr = System.err;
+
+	/*
+	 * Instance fields
+	 */
+
+	/**
+	 * The scratch directory
+	 */
+	protected final File scratch;
+
+	/**
+	 * Parsed version of the configuration file for this benchmark
+	 */
+	protected final Config config;
+
+	/**
+	 * Classloader used to run the benchmark
+	 */
+	protected ClassLoader loader;
+
+	/** Saved classloader across iterations */
+	private ClassLoader savedClassLoader;
+
+	/**
+	 * The system properties that were in effect when the harness was started.
+	 * 
+	 * @see System#getProperties()
+	 */
+	private Properties savedSystemProperties;
+
+	/**
+	 * Output stream for validating System.err
+	 */
+	private static TeePrintStream err = null;
+
+	/**
+	 * Output stream for validating System.out
+	 */
+	private static TeePrintStream out = null;
+
+	/**
+	 * Keep track of the number of times we have been iterated.
+	 */
+	protected int iteration = 0;
+
+	protected Method method;
+
+	/**
+	 * Run a benchmark. This is final because individual benchmarks should not
+	 * interfere with the flow of control.
+	 * 
+	 * @param callback
+	 *          The user-specified timing callback
+	 * @param size
+	 *          The size (as given on the command line)
+	 * @return Whether the run was valid or not.
+	 * @throws Exception
+	 *           Whatever exception the target application dies with
+	 */
+	public final boolean run(Callback callback, String size, TestHarness testHarness) throws Exception {
+		iteration++;
+		if (iteration == 1) {
+			prepare(size);
+
+			// this rather obscure addition is here in case the preparation stage
+			// of a benchmark manipulates System.out and System.err
+			System.setOut(savedOut);
+			System.setErr(savedErr);
+		}
+
+		preIteration(size);
+		// again we may have to correct a benchmarks manipulation of the
+		// Systemout and Sytem.err during the preIteration phase of the benchmark
+		System.setOut(savedOut);
+		System.setErr(savedErr);
+
+		if (preIterationGC) {
+			System.gc();
+		}
+
+		callback.start(config.name, testHarness);
+
+		final long start = System.currentTimeMillis();
+
+		startIteration();
+		try {
+			iterate(size);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			stopIteration();
+		}
+
+		final long duration = System.currentTimeMillis() - start;
+
+		callback.stop(duration);
+
+		boolean valid = validate(size);
+		callback.complete(config.name, valid, testHarness);
+		postIteration(size);
+		return valid;
+	}
+
+
+	/**
+	 * When an instance of a Benchmark is created, it is expected to prepare its
+	 * scratch directory, unloading files from the jar file if required.
+	 * 
+	 * @param scratch
+	 *          Scratch directory
+	 */
+	public Benchmark(Config config, File scratch, PrintStream saveOut,
+									 PrintStream saveErr) throws Exception {
+		this(config, scratch, true, saveOut, saveErr);
+	}
+
+	public Benchmark(Config config, File scratch, boolean silent, PrintStream saveOut,
+									 PrintStream saveErr)
+	    throws Exception {
+		// TODO this is very ugly
+		Benchmark.silent = silent;
+		this.scratch = scratch;
+		this.config = config;
+
+		savedOut = saveOut;
+		savedErr = saveErr;
+
+
+		initialize();
+	}
+
+	private void initialize() throws Exception {
+
+		System.gc();
+
+		savedSystemProperties = System.getProperties();
+
+		System.setProperty("java.util.logging.config.file",
+				fileInScratch(config.name + ".log"));
+		synchronized (System.out) {
+			if (out == null) {
+				out = new TeePrintStream(System.out, new File(scratch, "stdout.log"));
+				out.enableOutput(!silent);
+			}
+		}
+		synchronized (System.err) {
+			if (err == null) {
+				err = new TeePrintStream(System.err, new File(scratch, "stderr.log"));
+				err.enableOutput(!silent);
+			}
+		}
+		if(!IGNORE_JARS) {
+			prepareJars();
+		}
+		
+		loader = DacapoClassLoader.create(config, scratch);
+		prepare();
+	}
+
+	/**
+	 * Extract the jar files used by the benchmark
+	 * 
+	 * @throws Exception
+	 */
+	private void prepareJars() throws IOException, FileNotFoundException,
+	    DacapoException {
+		File file = new File(scratch + "/jar");
+		if (!file.exists())
+			file.mkdir();
+		String jarFolderPath = scratch.getParentFile().getPath() + "/jar";
+		if (config.jars != null) {
+			for (int i = 0; i < config.jars.length; i++) {
+				extractFileResource(jarFolderPath,  config.jars[i], new File(scratch, "jar"));
+			}
+		}
+	}
+
+	/**
+	 * Perform pre-benchmark preparation. By default it unpacks the zip file
+	 * <code>data/<i>name</i>.zip</code> into the scratch directory.
+	 */
+	protected void prepare() throws Exception {
+		unpackZipFileResource("dat/" + config.name + ".zip", scratch);
+	}
+
+	/**
+	 * One-off preparation performed once we know the benchmark size.
+	 * 
+	 * By default, does nothing.
+	 * 
+	 * @param size
+	 *          The size (as defined in the per-benchmark configuration file).
+	 */
+	protected void prepare(String size) throws Exception {
+	}
+
+	/**
+	 * Benchmark-specific per-iteration setup, outside the timing loop.
+	 * 
+	 * Needs to take care of any *required* cleanup when the -preserve flag us
+	 * used.
+	 * 
+	 * @param size
+	 *          Size as specified by the "-s" command line flag
+	 */
+	public void preIteration(String size) throws Exception {
+		if (verbose) {
+			String[] args = config.preprocessArgs(size, scratch);
+			System.out.print("Benchmark parameters: ");
+			for (int i = 0; i < args.length; i++)
+				System.out.print(args[i] + " ");
+			System.out.println();
+		}
+
+		/*
+		 * Allow those benchmarks that can't tolerate overwriting prior output to
+		 * run in the face of the '-preserve' flag.
+		 */
+		if (preserve && iteration > 1)
+			postIterationCleanup(size);
+	}
+
+	/**
+	 * Per-iteration setup, inside the timing loop. Nothing comes between this and
+	 * the call to 'iterate' - its purpose is to start collection of the input and
+	 * output streams. stopIteration() should be its inverse.
+	 */
+	public final void startIteration() {
+		if (verbose) {
+			System.out.println("startIteration()");
+		}
+		System.setProperty(TIMEOUT_DIALATION_PROPERTY, Benchmark.timeoutDialation);
+
+		final Properties augmentedSystemProperties = (Properties) savedSystemProperties
+		    .clone();
+		augmentSystemProperties(augmentedSystemProperties);
+		System.setProperties(augmentedSystemProperties);
+
+		if (validateOutput) {
+			System.setOut(out);
+			System.setErr(err);
+			if (iteration > 1) {
+				out.version();
+				err.version();
+			}
+			out.openLog();
+			err.openLog();
+		}
+		useBenchmarkClassLoader();
+	}
+
+	/**
+	 * Augments the system properties in case additional properties need to be in
+	 * effect during the actual benchmark iteration.
+	 * 
+	 * @param systemProperties
+	 *          the system properties that need to be augmented. (They may be
+	 *          modified freely.)
+	 */
+	public void augmentSystemProperties(Properties systemProperties) {
+	}
+
+	/**
+	 * An actual iteration of the benchmark. This is what is timed.
+	 * 
+	 * @param size
+	 *          Arguments to the benchmark
+	 */
+	public abstract void iterate(String size) throws Exception;
+
+	/**
+	 * Post-iteration tear-down, inside the timing loop. Restores standard output
+	 * and error, and saves the digest of the iteration output. This is inside the
+	 * timing loop so as not to process any output from the timing harness.
+	 */
+	public final void stopIteration() {
+		revertClassLoader();
+		if (validateOutput) {
+			out.closeLog();
+			err.closeLog();
+			System.setOut(savedOut);
+			System.setErr(savedErr);
+		}
+
+		System.setProperties(savedSystemProperties);
+
+		if (verbose) {
+			System.out.println("stopIteration()");
+		}
+	}
+
+	/**
+	 * TODO
+	 */
+	protected void useBenchmarkClassLoader() {
+		if (loader != null) {
+			savedClassLoader = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(loader);
+		}
+	}
+
+	/**
+	 * TODO
+	 */
+	protected void revertClassLoader() {
+		if (loader != null) {
+			Thread.currentThread().setContextClassLoader(savedClassLoader);
+		}
+	}
+
+	/**
+	 * Perform validation of output. By default process the conditions specified
+	 * in the config file.
+	 * 
+	 * @param size
+	 *          Size of the benchmark run.
+	 * @return true if the output was correct
+	 */
+	public boolean validate(String size) {
+		if (verbose) {
+			System.out.println("validate(" + validate + ")");
+		}
+		if (!validate)
+			return true;
+
+		if (validationReport) {
+			valRepFile.println("Validating " + config.name + " " + size);
+		}
+		boolean valid = true;
+		for (String file : config.getOutputs(size)) {
+
+			/*
+			 * Validate by file digest
+			 */
+			if (config.hasDigest(size, file)) {
+				String refDigest = config.getDigest(size, file);
+				String digest;
+
+				try {
+					digest = Digest.toString(FileDigest.get(fileInScratch(file),
+					    config.isTextFile(size, file), config.filterScratch(size, file),
+					    scratch));
+				} catch (FileNotFoundException e) {
+					digest = "<File not found>";
+				} catch (IOException e) {
+					digest = "<IO exception>";
+					e.printStackTrace();
+				}
+				if (validationReport) {
+					valRepFile.println("  \"" + file + "\" digest 0x" + digest + ",");
+				}
+				if (!validateOutput
+				    && (file.equals("$stdout") || file.equals("$stderr"))) {
+					// Not collecting digests for stdout and stderr, so can't check them
+				} else if (!digest.equals(refDigest)) {
+					valid = false;
+					System.err.println("Digest validation failed for " + file
+					    + ", expecting 0x" + refDigest + " found 0x" + digest);
+				} else if (verbose) {
+					System.out.println("Digest validation succeeded for " + file);
+				}
+			}
+
+			/*
+			 * Validate by line count
+			 */
+			if (config.hasLines(size, file)) {
+				int refLines = config.getLines(size, file);
+				int lines;
+				try {
+					lines = lineCount(new File(scratch, file));
+				} catch (FileNotFoundException e) {
+					System.err.println("File not found, " + file);
+					lines = -1;
+				} catch (IOException e) {
+					e.printStackTrace();
+					lines = -1;
+				}
+				if (validationReport) {
+					valRepFile.println("  \"" + file + "\" lines " + lines + ",");
+				}
+				if (lines != refLines) {
+					valid = false;
+					System.err.println("Line count validation failed for " + file
+					    + ", expecting " + refLines + " found " + lines);
+				} else if (verbose) {
+					System.out.println("Line count validation succeeded for " + file);
+				}
+			}
+
+			/*
+			 * Validate by byte count
+			 */
+			if (config.hasBytes(size, file)) {
+				long refBytes = config.getBytes(size, file);
+				long bytes;
+				try {
+					bytes = byteCount(new File(scratch, file));
+				} catch (FileNotFoundException e) {
+					System.err.println("File not found, " + file);
+					bytes = -1;
+				} catch (IOException e) {
+					e.printStackTrace();
+					bytes = -1;
+				}
+				if (validationReport) {
+					valRepFile.println("  \"" + file + "\" bytes " + bytes + ",");
+				}
+				if (bytes != refBytes) {
+					valid = false;
+					System.err.println("Byte count validation failed for " + file
+					    + ", expecting " + refBytes + " found " + bytes);
+				} else if (verbose) {
+					System.out.println("Byte count validation succeeded for " + file);
+				}
+			}
+
+			/*
+			 * Check for existence
+			 */
+			if (config.checkExists(size, file)) {
+				if (!new File(scratch, file).exists()) {
+					System.err.println("Expected file " + file + " does not exist");
+					valid = false;
+				} else if (verbose) {
+					System.out.println("Existence validation succeeded for " + file);
+				}
+			}
+		}
+		if (validationReport) {
+			valRepFile.flush();
+		}
+		return valid;
+	}
+
+	/**
+	 * Per-iteration cleanup, outside the timing loop. By default it deletes the
+	 * named output files.
+	 * 
+	 * @param size
+	 *          Argument to the benchmark iteration.
+	 */
+	public void postIteration(String size) throws Exception {
+		if (!preserve) {
+			postIterationCleanup(size);
+		}
+	}
+
+	/**
+	 * Perform post-iteration cleanup.
+	 * 
+	 * @param size
+	 */
+	protected void postIterationCleanup(String size) {
+		for (String file : config.getOutputs(size)) {
+			if (file.equals("$stdout") || file.equals("$stderr")) {
+			} else {
+				if (!config.isKept(size, file))
+					deleteFile(new File(scratch, file));
+			}
+		}
+	}
+
+	/**
+	 * Perform post-benchmark cleanup, deleting output files etc. By default it
+	 * deletes a subdirectory of the scratch directory with the same name as the
+	 * benchmark.
+	 */
+	public void cleanup() {
+		if (!preserve) {
+			loader = null;
+			System.gc();
+			deleteTree(new File(scratch, config.name));
+			err = null;
+			out = null;
+		}
+	}
+
+	/*************************************************************************************
+	 * Utility methods
+	 */
+
+	/**
+	 * Translate a resource name into a URL.
+	 * 
+	 * @param fn
+	 * @return
+	 */
+	public static URL getURL(String fn) {
+		ClassLoader cl = Benchmark.class.getClassLoader();
+		URL resource = cl.getResource(fn);
+		if (verbose)
+			System.out.println("Util.getURL: returns " + resource);
+		return resource;
+	}
+
+	/**
+	 * Return a file name, relative to the specified scratch directory.
+	 * 
+	 * @param name
+	 *          Name of the file, relative to the top of the scratch directory
+	 * @return The path name of the file
+	 */
+	public String fileInScratch(String name) {
+		return new File(scratch, name).getPath();
+	}
+
+	/**
+	 * Unpack a zip file resource into the specified directory. The directory
+	 * structure of the zip archive is preserved.
+	 * 
+	 * @param name
+	 * @param destination
+	 * @throws IOException
+	 */
+	public static void unpackZipFileResource(String name, File destination)
+	    throws IOException, FileNotFoundException, DacapoException {
+		BufferedInputStream bfis = null;
+		InputStream is = null;
+		try {
+			is = new etalon.purdue.edu.base.wrapper.FileInputStream(name);
+			bfis = new BufferedInputStream(is);
+			unpackZipStream(bfis, destination);
+		} catch (FileNotFoundException fe) {
+			System.out.println("destination: " + destination);
+		} finally {
+			if(is != null) {
+				is.close();
+			}
+			if (bfis != null)
+				bfis.close();
+			is = null;
+			bfis = null;
+		}
+
+		// URL resource = getURL(name);
+		// if (is. == null)
+		// throw new DacapoException("No such zip file: \"" + name + "\"");
+
+
+
+	}
+
+	public static void extractFileResource(String folder, String name, File destination)
+	    throws IOException, FileNotFoundException, DacapoException {
+		if (verbose)
+			System.out.println("Extracting file " + name + " into "
+			    + destination.getCanonicalPath());
+//		URL resource = getURL(name);
+//		if (resource == null)
+//			throw new DacapoException("No such file: \"" + name + "\"");
+		FileInputStream is = new FileInputStream(new File(folder,name));
+		
+		BufferedInputStream inputStream = new BufferedInputStream(
+		    is);
+		fileFromInputStream(inputStream, new File(destination, name));
+		is.close();
+		inputStream.close();
+	}
+
+	/**
+	 * @param inputStream
+	 * @param destination
+	 * @throws IOException
+	 */
+	private static void unpackZipStream(BufferedInputStream inputStream,
+	    File destination) throws IOException {
+		if(inputStream == null) {
+			if(destination.isDirectory()) {
+				if (!destination.exists())
+					destination.mkdir();
+			}
+			return;
+		}
+
+		ZipInputStream input = new ZipInputStream(inputStream);
+		ZipEntry entry;
+		while ((entry = input.getNextEntry()) != null) {
+			if (verbose)
+				System.out.println("Unpacking " + entry.getName());
+			File file = new File(destination, entry.getName());
+			if (entry.isDirectory()) {
+				if (!file.exists())
+					file.mkdir();
+			} else {
+				fileFromInputStream(input, file);
+			}
+		}
+		input.close();
+	}
+
+
+
+	private static void fileFromInputStream(InputStream input, File file)
+	    throws IOException {
+		FileOutputStream fos = new FileOutputStream(file);
+		BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER_SIZE);
+		int count;
+		byte data[] = new byte[BUFFER_SIZE];
+		while ((count = input.read(data, 0, BUFFER_SIZE)) != -1) {
+			dest.write(data, 0, count);
+		}
+		dest.flush();
+		dest.close();
+		fos.close();
+	}
+
+	public static void deleteTree(File tree) {
+		if (verbose)
+			System.out.println("Deleting " + tree.getName());
+		if (!tree.isDirectory())
+			deleteFile(tree);//tree.delete();
+		else {
+			File[] files = tree.listFiles();
+			for (int i = 0; i < files.length; i++)
+				deleteFile(files[i]);//deleteTree(files[i]);
+						tree.delete();
+		}
+	}
+
+
+
+	public static void deleteFile(File file) {
+		if (verbose)
+			System.out.println("Deleting " + file.getName());
+		if (file.exists() && !file.isDirectory()) {
+			File to = new File(file.getAbsolutePath() + System.currentTimeMillis());
+			boolean renameStatus = file.renameTo(to);
+			boolean deleteStatus = to.delete();
+			boolean returnStatus = ( renameStatus && deleteStatus );
+			if (verbose)
+				System.out.print("Deleting file" + file.getAbsolutePath());
+			//file.delete();
+		}
+	}
+
+	public static int lineCount(File file) throws IOException {
+		int lines = 0;
+		BufferedReader in = new BufferedReader(new FileReader(file));
+		while (in.readLine() != null)
+			lines++;
+		in.close();
+		return lines;
+	}
+
+	public static long byteCount(File file) throws IOException {
+		return file.length();
+	}
+
+	public static void setCommandLineOptions(CommandLineArgs line) {
+		silent = line.getSilent();
+		preserve = line.getPreserve();
+		validate = line.getValidate();
+		validateOutput = line.getValidateOutput();
+		preIterationGC = line.getPreIterationGC();
+		timeoutDialation = line.getTimeoutDialation();
+		if (line.getValidationReport() != null)
+			Benchmark.enableValidationReport(line.getValidationReport());
+	}
+
+	private static void enableValidationReport(String filename) {
+		try {
+			validationReport = true;
+			// Append to an output file
+			valRepFile = new PrintWriter(new BufferedWriter(new FileWriter(filename,
+			    true)));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+	// getter methods
+	public static boolean getVerbose() {
+		return verbose;
+	}
+
+	public static boolean getValidateOutput() {
+		return validateOutput;
+	}
+
+	public static boolean getValidate() {
+		return validate;
+	}
+
+	public static boolean getPreserve() {
+		return preserve;
+	}
+
+	protected int getIteration() {
+		return iteration;
+	}
+
+	public static boolean getSilent() {
+		return silent;
+	}
+
+}

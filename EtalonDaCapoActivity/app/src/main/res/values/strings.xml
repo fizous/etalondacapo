@@ -1,0 +1,19 @@
+<resources>
+  <string name="app_name">DaCapo</string>
+
+  <string name="conf_file_name">app_conf.xml</string>
+  <string name="conf_dir_name">data</string>
+  <string name="external_root_path">benchmarks/dacapo</string>
+
+  <string name="btnl_lusearch">lusearch</string>
+  <string name="btnl_sqlite">sqlite</string>
+  <string name="btnl_xalan">xalan</string>
+  <string name="btnl_pmd">pmd</string>
+
+
+  <string name="label_btnr_sigusr1">SIGUSR1</string>
+  <string name="label_btnr_quit">kill</string>
+
+  <string name="large_text">""</string>
+  <string name="action_settings">Settings</string>
+</resources>

@@ -14,8 +14,6 @@ import etalon.purdue.edu.base.ui.BaseTextReport;
 import etalon.purdue.edu.base.ui.ButtonContainer;
 import etalon.purdue.edu.base.ui.GenericBtnActionImpl;
 import etalon.purdue.edu.base.wrapper.LogTool;
-import etalon.purdue.edu.dacapo.config.BMHelper;
-import etalon.purdue.edu.dacapoactivity.R;
 
 
 /**
@@ -208,7 +206,7 @@ public class BaseActivityHelper {
    * @param benchTag is the tag used to mark the log messages coming from the
    * 				application
    */
-  public static void setSystemOutputs(BMHelper bmHelper, String benchTag) {
+  public static void setSystemOutputs(BaseBMHelper bmHelper, String benchTag) {
     singleToneIns.createTxtArea();
 
     LogTool errUI = LogTool.createSystemErrWithUI(benchTag, "System.err",
@@ -250,7 +248,10 @@ public class BaseActivityHelper {
 
 
   public TextView getReportingTextArea() {
-    TextView tv = (TextView) mActivity.findViewById(R.id.report_text_area);
+
+    int tvId = getResourceIDbyName("report_text_area");
+
+    TextView tv = (TextView) mActivity.findViewById(tvId);
 //    if(isScrollable && Thread.currentThread().equals(SpecJVM98Helper.getMainThread()))
 //      tv.setMovementMethod(new ScrollingMovementMethod());
     return tv;
@@ -266,12 +267,18 @@ public class BaseActivityHelper {
   public TextView getTextViewByName(String tvName) {
     int tvId = mActivity.getResources().getIdentifier(tvName, "id",
         mActivity.getPackageName());
-    TextView tv = (TextView) mActivity.findViewById(R.id.report_text_area);
+    TextView tv = (TextView) mActivity.findViewById(tvId);
 
     return tv;
   }
 
   public String getPropValue(String propKey) {
     return mConfigurations.getConfigValue(propKey);
+  }
+
+  public int getResourceIDbyName(String resourceID) {
+    int rId = mActivity.getResources().getIdentifier(resourceID, "id",
+        mActivity.getPackageName());
+    return rId;
   }
 }

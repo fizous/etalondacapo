@@ -12,6 +12,7 @@ import android.view.View;
 import etalon.purdue.edu.base.BaseActivityHelper;
 import etalon.purdue.edu.dacapoactivity.R;
 
+
 /**
  * The type Da capo activity.
  */
@@ -61,4 +62,6 @@ public class DaCapoActivity extends AppCompatActivity {
     }
     return super.onOptionsItemSelected(item);
   }
+
+
 }

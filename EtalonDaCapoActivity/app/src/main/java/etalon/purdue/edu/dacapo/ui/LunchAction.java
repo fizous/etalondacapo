@@ -3,6 +3,7 @@ package etalon.purdue.edu.dacapo.ui;
 import etalon.purdue.edu.base.BaseActivityHelper;
 import etalon.purdue.edu.base.ConfigManager;
 import etalon.purdue.edu.base.ui.ButtonContainer;
+import etalon.purdue.edu.base.ui.ConsoleSetter;
 import etalon.purdue.edu.base.ui.LunchAppBtnAction;
 import etalon.purdue.edu.dacapo.DaCapoBMRunner;
 import etalon.purdue.edu.dacapo.config.BMHelper;
@@ -11,36 +12,6 @@ import etalon.purdue.edu.dacapo.config.BMHelper;
  * Created by hussein on 5/26/16.
  */
 public class LunchAction extends LunchAppBtnAction {
-
-
-  /**
-   * The type Console setter.
-   */
-  class ConsoleSetter implements Runnable {
-    /**
-     * The Bm helper.
-     */
-    BMHelper bmHelper;
-
-    /**
-     * Instantiates a new Console setter.
-     *
-     * @param bmHelper the bm helper
-     */
-    public ConsoleSetter(BMHelper bmHelper) {
-      this.bmHelper = bmHelper;
-    }
-    @Override
-    public void run() {
-      BaseActivityHelper.setSystemOutputs(bmHelper, bmHelper.getTag());
-      synchronized (bmHelper) {
-        bmHelper.ready = true;
-        bmHelper.notifyAll();
-        //Log.e("testErr", "Done bmHelper");
-      }
-    }
-
-  }
 
   private String appName;
 

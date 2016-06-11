@@ -14,9 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * Created by hussein on 5/25/16.
@@ -132,7 +135,7 @@ public class ConfigManager {
 
     String extDirPath =
         creatorActivity.getResources().getString(extRootPathId);// +
-            //File.separator + creatorActivity.getResources().getString(appNameId);
+    //File.separator + creatorActivity.getResources().getString(appNameId);
 
     appRootPath = Environment.getExternalStorageDirectory() + File.separator +
         extDirPath;
@@ -162,8 +165,12 @@ public class ConfigManager {
     properties = new Properties();
     for (Map.Entry<String, ?> entry : configs.getAll().entrySet()) {
       String key = entry.getKey();
-      String value = entry.getValue().toString();
-      properties.setProperty(key, value);
+      if(key.startsWith("list_")) {
+        properties.put(key, entry.getValue());
+      } else {
+        String value = entry.getValue().toString();
+        properties.setProperty(key, value);
+      }
     }
 
     if (isReadableCard()) {
@@ -183,7 +190,16 @@ public class ConfigManager {
         while (enuKeys.hasMoreElements()) {
           String key = (String) enuKeys.nextElement();
           String value = properties.getProperty(key);
-          editor.putString(key, value);
+          if (key.startsWith("list_")) {
+            StringTokenizer st = new StringTokenizer(value);
+            HashSet<String> libList = new HashSet <String>();
+            while (st.hasMoreTokens()) {
+              libList.add(st.nextToken());
+            }
+            editor.putStringSet(key, libList);
+          } else {
+            editor.putString(key, value);
+          }
           editor.commit();
         }
 
@@ -374,5 +390,11 @@ public class ConfigManager {
    */
   private boolean isWritableCard() {
     return ((storageAccess & WRITABLE_MEM) > 0);
+  }
+
+  public Set<String> getStringList(String key) {
+    HashSet<String> list = new HashSet<String>();
+    list.addAll(this.configs.getStringSet(key, list));
+    return list;
   }
 }

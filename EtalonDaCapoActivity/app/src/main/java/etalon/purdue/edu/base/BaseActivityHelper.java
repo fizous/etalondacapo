@@ -59,8 +59,8 @@ public class BaseActivityHelper {
   public static void setEnableLunchButtons(boolean flag) {
     for (ButtonContainer bc : singleToneIns.appButtons) {
       //if (BtnsPredicates.isLunchBtn((GenericBtnActionImpl) bc.getAction())) {
-        bc.setEnabledFlag(flag);
-     // }
+      bc.setEnabledFlag(flag);
+      // }
     }
   }
 
@@ -193,7 +193,7 @@ public class BaseActivityHelper {
     List<String> benchmarks = new ArrayList<String>();
     for (ButtonContainer bc : singleToneIns.appButtons) {
       //if (BtnsPredicates.isLunchBtn((GenericBtnActionImpl) bc.getAction())) {
-        benchmarks.add(bc.getLabel());
+      benchmarks.add(bc.getLabel());
       //}
     }
     return benchmarks;
@@ -248,25 +248,20 @@ public class BaseActivityHelper {
 
 
   public TextView getReportingTextArea() {
+    TextView tv = getTextViewByName("report_text_area");
 
-    int tvId = getResourceIDbyName("report_text_area");
-
-    TextView tv = (TextView) mActivity.findViewById(tvId);
-//    if(isScrollable && Thread.currentThread().equals(SpecJVM98Helper.getMainThread()))
-//      tv.setMovementMethod(new ScrollingMovementMethod());
     return tv;
   }
 
   public void createTxtArea() {
     if(mConfigurations.isGuiEnabled() &&  this.txtReport == null) {
       this.txtReport = new BaseTextReport(this);
-     // Log.e("ess", "after AReat creation");
+      // Log.e("ess", "after AReat creation");
     }
   }
 
   public TextView getTextViewByName(String tvName) {
-    int tvId = mActivity.getResources().getIdentifier(tvName, "id",
-        mActivity.getPackageName());
+    int tvId = getResourceIDbyName(tvName);
     TextView tv = (TextView) mActivity.findViewById(tvId);
 
     return tv;

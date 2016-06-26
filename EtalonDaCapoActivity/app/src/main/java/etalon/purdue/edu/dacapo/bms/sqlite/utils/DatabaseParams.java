@@ -27,14 +27,12 @@ public class DatabaseParams {
   }
 
   public static class Delete {
-
     public String table;
     public String whereClause;
     public String[] whereArgs;
   }
 
   public static class Select {
-
     public boolean distinct;
     public String table;
     public String[] columns;

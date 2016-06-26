@@ -18,15 +18,15 @@ public class DaCapoBMRunner extends BMThread {
     super(bmHelper);
   }
 
-
   /**
    * Any child inheriting from this calss has to override this function which
    * represents the main execution of a thread
    */
   protected void executeTask() {
     TestHarness tHarnesss = new TestHarness();
-    String[] args = this.bmHelper.getBmArgs();
-    tHarnesss.runHarness(args, this.bmHelper.getOutStream(), this.bmHelper.getErrStream());
+    String[]    args      = this.bmHelper.getBmArgs();
+    tHarnesss.runHarness(args, this.bmHelper.getOutStream(),
+                         this.bmHelper.getErrStream());
   }
 
   @Override
@@ -38,7 +38,5 @@ public class DaCapoBMRunner extends BMThread {
   protected void hookingPostRun() {
 
   }
-
-
 
 }

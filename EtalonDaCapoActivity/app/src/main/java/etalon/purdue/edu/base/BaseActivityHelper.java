@@ -15,7 +15,6 @@ import etalon.purdue.edu.base.ui.ButtonContainer;
 import etalon.purdue.edu.base.ui.GenericBtnActionImpl;
 import etalon.purdue.edu.base.wrapper.LogTool;
 
-
 /**
  * Created by hussein on 5/25/16.
  */
@@ -37,10 +36,10 @@ public class BaseActivityHelper {
    */
   public List<ButtonContainer> appButtons;
 
-
   public List<ButtonContainer> sigButtons;
 
   public BaseTextReport txtReport;
+
   /**
    * Create base activity helper.
    *
@@ -63,7 +62,6 @@ public class BaseActivityHelper {
       // }
     }
   }
-
 
   /**
    * Instantiates a new Base activity helper.
@@ -90,17 +88,17 @@ public class BaseActivityHelper {
 
     for (String btnName : btnsList) {
       int btnId = mActivity.getResources().getIdentifier(btnName, "id",
-          mActivity.getPackageName());
+                                                         mActivity
+                                                               .getPackageName());
       String actionName = mConfigurations.GetButtonAction(btnName);
       ButtonContainer btnHolder =
-          ButtonContainer.Create(mActivity, btnId, actionName,
-              mConfigurations.GetButtonLabel(btnName));
+            ButtonContainer.Create(mActivity, btnId, actionName,
+                                   mConfigurations.GetButtonLabel(btnName));
       SetButnAction(btnHolder, this);
       btnHolder.setClickListener();
       this.appButtons.add(btnHolder);
     }
   }
-
 
   private void construcSignalButtons() {
     this.sigButtons = new ArrayList<ButtonContainer>();
@@ -110,11 +108,12 @@ public class BaseActivityHelper {
 
     for (String btnName : btnsList) {
       int btnId = mActivity.getResources().getIdentifier(btnName, "id",
-          mActivity.getPackageName());
+                                                         mActivity
+                                                               .getPackageName());
       String actionName = mConfigurations.GetButtonAction(btnName);
       ButtonContainer btnHolder =
-          ButtonContainer.Create(mActivity, btnId, actionName,
-              mConfigurations.GetButtonLabel(btnName));
+            ButtonContainer.Create(mActivity, btnId, actionName,
+                                   mConfigurations.GetButtonLabel(btnName));
       SetButnAction(btnHolder, mConfigurations.GetButtonSignal(btnName));
       btnHolder.setClickListener();
       this.sigButtons.add(btnHolder);
@@ -124,9 +123,10 @@ public class BaseActivityHelper {
   private void SetButnAction(ButtonContainer btnContainer, Object data) {
     try {
       Class<? extends GenericBtnActionImpl> clzz =
-          ((Class<? extends GenericBtnActionImpl>) Class.forName(btnContainer.getActionName()));
+            ((Class<? extends GenericBtnActionImpl>) Class
+                  .forName(btnContainer.getActionName()));
       Constructor<? extends GenericBtnActionImpl> constr =
-          clzz.getConstructor(Object.class, ButtonContainer.class);
+            clzz.getConstructor(Object.class, ButtonContainer.class);
       btnContainer.setAction(constr.newInstance(data, btnContainer));
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -146,9 +146,10 @@ public class BaseActivityHelper {
   public void resetButnAction(ButtonContainer btnContainer, Object data) {
     try {
       Class<? extends GenericBtnActionImpl> clzz =
-          ((Class<? extends GenericBtnActionImpl>) Class.forName(btnContainer.getActionName()));
+            ((Class<? extends GenericBtnActionImpl>) Class
+                  .forName(btnContainer.getActionName()));
       Constructor<? extends GenericBtnActionImpl> constr =
-          clzz.getConstructor(Object.class, ButtonContainer.class);
+            clzz.getConstructor(Object.class, ButtonContainer.class);
       btnContainer.setAction(constr.newInstance(data, btnContainer));
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -204,24 +205,23 @@ public class BaseActivityHelper {
    * applications to LogCat.
    *
    * @param benchTag is the tag used to mark the log messages coming from the
-   * 				application
+   *                 application
    */
   public static void setSystemOutputs(BaseBMHelper bmHelper, String benchTag) {
     singleToneIns.createTxtArea();
 
     LogTool errUI = LogTool.createSystemErrWithUI(benchTag, "System.err",
-        singleToneIns.mConfigurations.isGuiEnabled(),
-        singleToneIns.txtReport
-    );
+                                                  singleToneIns.mConfigurations
+                                                        .isGuiEnabled(),
+                                                  singleToneIns.txtReport
+                                                 );
     LogTool outUI = LogTool.createSystemOutWithUI(benchTag, "System.out",
-        singleToneIns.mConfigurations.isGuiEnabled(),
-        singleToneIns.txtReport
-    );
-
-
+                                                  singleToneIns.mConfigurations
+                                                        .isGuiEnabled(),
+                                                  singleToneIns.txtReport
+                                                 );
 
     bmHelper.setOutPrintStream(new PrintStream(outUI));
-
 
     bmHelper.setErrPrintStream(new PrintStream(errUI));
 
@@ -246,7 +246,6 @@ public class BaseActivityHelper {
 //        LogTool.createSystemOut(benchTag)));
   }
 
-
   public TextView getReportingTextArea() {
     TextView tv = getTextViewByName("report_text_area");
 
@@ -254,15 +253,15 @@ public class BaseActivityHelper {
   }
 
   public void createTxtArea() {
-    if(mConfigurations.isGuiEnabled() &&  this.txtReport == null) {
+    if (mConfigurations.isGuiEnabled() && this.txtReport == null) {
       this.txtReport = new BaseTextReport(this);
       // Log.e("ess", "after AReat creation");
     }
   }
 
   public TextView getTextViewByName(String tvName) {
-    int tvId = getResourceIDbyName(tvName);
-    TextView tv = (TextView) mActivity.findViewById(tvId);
+    int      tvId = getResourceIDbyName(tvName);
+    TextView tv   = (TextView) mActivity.findViewById(tvId);
 
     return tv;
   }
@@ -273,7 +272,8 @@ public class BaseActivityHelper {
 
   public int getResourceIDbyName(String resourceID) {
     int rId = mActivity.getResources().getIdentifier(resourceID, "id",
-        mActivity.getPackageName());
+                                                     mActivity
+                                                           .getPackageName());
     return rId;
   }
 }

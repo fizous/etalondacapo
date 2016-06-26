@@ -19,14 +19,11 @@ import etalon.purdue.edu.dacapoactivity.R;
  */
 public class TellerDAO {
   interface Table {
-
     String COLUMN_ID = "Tid";
     String COLUMN_BID = "Bid";
     String COLUMN_TBALANCE = "Tbalance";
     String COLUMN_FILLER = "filler";
   }
-
-
 
   private SQLiteDatabase mDatabase;
   private Context mContext;
@@ -62,11 +59,6 @@ public class TellerDAO {
       mDatabase.execSQL(mContext.getString(R.string.insert_teller), bindArgs);
     }
   }
-
-
-
-
-
 
   public List<TellerEntity> selectAll() {
     Cursor cursor = mDatabase.rawQuery(mContext.getString(R.string.select_all_tellers), null);

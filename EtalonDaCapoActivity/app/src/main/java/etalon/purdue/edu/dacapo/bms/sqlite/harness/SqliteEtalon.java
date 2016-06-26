@@ -37,7 +37,6 @@ public class SqliteEtalon extends Benchmark {
     }
   }
 
-
   @Override
   protected void prepare() throws Exception {
 //    String dataBaseFileName =

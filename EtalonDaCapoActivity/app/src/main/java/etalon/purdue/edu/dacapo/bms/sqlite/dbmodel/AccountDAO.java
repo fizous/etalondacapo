@@ -9,7 +9,6 @@ import java.util.List;
 
 import etalon.purdue.edu.dacapoactivity.R;
 
-
 /**
  * Created by hussein on 2/10/16.
  */
@@ -21,8 +20,6 @@ public class AccountDAO {
     String COLUMN_ABALANCE = "Abalance";
     String COLUMN_FILLER = "filler";
   }
-
-
 
   private SQLiteDatabase mDatabase;
   private Context mContext;
@@ -52,8 +49,8 @@ public class AccountDAO {
 
     for (AccountEntity acc : userList) {
       String[] bindArgs = {
-              String.valueOf(acc.getmAid()),
-              String.valueOf(acc.getmBid())
+            String.valueOf(acc.getmAid()),
+            String.valueOf(acc.getmBid())
       };
       mDatabase.execSQL(mContext.getString(R.string.insert_account), bindArgs);
     }
@@ -61,25 +58,26 @@ public class AccountDAO {
 
   public void insert(AccountEntity acc) {
     String[] bindArgs = {
-            String.valueOf(acc.getmAid()),
-            String.valueOf(acc.getmBid())
+          String.valueOf(acc.getmAid()),
+          String.valueOf(acc.getmBid())
     };
     mDatabase.execSQL(mContext.getString(R.string.insert_account), bindArgs);
   }
 
   public void updateAccountBalanceByID(long bid, int balance) {
     String[] bindArgs = {
-            String.valueOf(balance),
-            String.valueOf(bid)
+          String.valueOf(balance),
+          String.valueOf(bid)
     };
-    mDatabase.execSQL(mContext.getString(R.string.update_branch_balance_by_bid), bindArgs);
+    mDatabase.execSQL(mContext.getString(R.string.update_branch_balance_by_bid),
+                      bindArgs);
   }
 
   public List<AccountEntity> selectAccountByID(long aid) {
     String[] selectionArgs = {
-            String.valueOf(aid)
+          String.valueOf(aid)
     };
-    String query = mContext.getString(R.string.select_account_by_aid);
+    String query  = mContext.getString(R.string.select_account_by_aid);
     Cursor cursor = mDatabase.rawQuery(query, selectionArgs);
 
     List<AccountEntity> dataList = manageCursor(cursor);
@@ -91,9 +89,9 @@ public class AccountDAO {
 
   public List<AccountEntity> selectByAge(int age) {
     String[] selectionArgs = {
-            String.valueOf(age)
+          String.valueOf(age)
     };
-    String query = mContext.getString(R.string.select_users_by_age);
+    String query  = mContext.getString(R.string.select_users_by_age);
     Cursor cursor = mDatabase.rawQuery(query, selectionArgs);
 
     List<AccountEntity> dataList = manageCursor(cursor);
@@ -104,7 +102,8 @@ public class AccountDAO {
   }
 
   public List<AccountEntity> selectAll() {
-    Cursor cursor = mDatabase.rawQuery(mContext.getString(R.string.select_all_users), null);
+    Cursor cursor = mDatabase
+          .rawQuery(mContext.getString(R.string.select_all_users), null);
 
     List<AccountEntity> dataList = manageCursor(cursor);
 
@@ -114,10 +113,10 @@ public class AccountDAO {
   }
 
   protected AccountEntity cursorToData(Cursor cursor) {
-    int idIndex = cursor.getColumnIndex(Table.COLUMN_ID);
-    int bidIndex = cursor.getColumnIndex(Table.COLUMN_BID);
+    int idIndex      = cursor.getColumnIndex(Table.COLUMN_ID);
+    int bidIndex     = cursor.getColumnIndex(Table.COLUMN_BID);
     int ablanceIndex = cursor.getColumnIndex(Table.COLUMN_ABALANCE);
-    int fillerIndex = cursor.getColumnIndex(Table.COLUMN_FILLER);
+    int fillerIndex  = cursor.getColumnIndex(Table.COLUMN_FILLER);
 
     AccountEntity user = new AccountEntity();
     user.setmAid(cursor.getLong(idIndex));

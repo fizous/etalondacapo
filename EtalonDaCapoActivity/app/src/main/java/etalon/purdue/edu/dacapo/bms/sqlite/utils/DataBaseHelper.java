@@ -14,8 +14,6 @@ import etalon.purdue.edu.dacapo.bms.sqlite.dbmodel.TellerDAO;
  * Created by hussein on 2/9/16.
  */
 public class DataBaseHelper extends SQLiteOpenHelper {
-
-
   public static final String DATABASE_NAME = "sqlitedacapo";
   public static final int DATABASE_VERSION = 1;
   private Context mContext;
@@ -31,7 +29,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     return helperInstant;
   }
 
-
   public static synchronized boolean ShutdownDatabaseHelper() {
     if(helperInstant == null) {
       return true;
@@ -45,15 +42,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     mContext = context;
   }
 
-
   private void createDBTables(SQLiteDatabase sqLiteDatabase) {
     sqLiteDatabase.execSQL(BrancheDAO.getCreateTable(mContext));
     sqLiteDatabase.execSQL(TellerDAO.getCreateTable(mContext));
     sqLiteDatabase.execSQL(AccountDAO.getCreateTable(mContext));
     sqLiteDatabase.execSQL(HistoryDAO.getCreateTable(mContext));
   }
-
-
 
   private void dropDBTables(SQLiteDatabase sqLiteDatabase) {
     sqLiteDatabase.execSQL(HistoryDAO.getDropTable(mContext));
@@ -67,19 +61,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     //  System.err.println("start creating from tables");
       DataBaseManager.getInstance().executeQuery(new QueryExecutor() {
         public void run(SQLiteDatabase database) {
-////          StringBuffer queryString = new StringBuffer();
-////          queryString.append(BrancheDAO.getCreateTable(mContext));
-////          queryString.append("\n");
-////          queryString.append(TellerDAO.getCreateTable(mContext));
-////          queryString.append("\n");
-////          queryString.append(AccountDAO.getCreateTable(mContext));
-////          queryString.append("\n");
-////          queryString.append(HistoryDAO.getCreateTable(mContext));
-////          queryString.append("\n");
-////          database.execSQL(queryString.toString());
-//
-//         // System.out.println("creating query---------\n" + queryString.toString());
-
           createDBTables(database);
         }
       });
@@ -95,18 +76,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      // System.err.println("start dropping tables");
       DataBaseManager.getInstance().executeQuery(new QueryExecutor() {
         public void run(SQLiteDatabase database) {
-//          StringBuffer queryString = new StringBuffer();
-//          queryString.append(HistoryDAO.getDropTable(mContext));
-//          queryString.append("\n");
-//          queryString.append(AccountDAO.getDropTable(mContext));
-//          queryString.append("\n");
-//          queryString.append(TellerDAO.getDropTable(mContext));
-//          queryString.append("\n");
-//          queryString.append(BrancheDAO.getDropTable(mContext));
-//          queryString.append("\n");
-//          database.execSQL(queryString.toString());
-//          System.out.println("dropping query=====\n" + queryString.toString());
-
           dropDBTables(database);
         }
       });
@@ -118,9 +87,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase sqLiteDatabase) {
     // create all tables
-   // System.err.println("onCreate SqlHelper");
     createDBTables(sqLiteDatabase);
-    //sqLiteDatabase.execSQL(UserDAO.getCreateTable(mContext));
   }
 
   @Override

@@ -13,7 +13,6 @@ import etalon.purdue.edu.base.BaseActivityHelper;
  */
 public class ActivityHelper extends BaseActivityHelper {
 
-
   /**
    * Instantiates a new Activity helper.
    *
@@ -36,7 +35,4 @@ public class ActivityHelper extends BaseActivityHelper {
         Joiner.on(" ").join(extraArgs)
     };
   }
-
-
-
 }

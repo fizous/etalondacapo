@@ -57,7 +57,8 @@ public class BaseBMHelper {
     this.ready = false;
     this.properties = new Properties();
     try {
-      File file = new File(mActivityHelper.mConfigurations.getAppConfFile(appName));
+      File            file      =
+            new File(mActivityHelper.mConfigurations.getAppConfFile(appName));
       FileInputStream fileInput = new FileInputStream(file);
       this.properties.loadFromXML(fileInput);
     } catch (FileNotFoundException e) {
@@ -69,7 +70,6 @@ public class BaseBMHelper {
     }
   }
 
-
   /**
    * Gets bm worload.
    *
@@ -77,7 +77,7 @@ public class BaseBMHelper {
    */
   public String getBmWorload() {
     String workload = properties.getProperty("workload");
-    if(workload != null) {
+    if (workload != null) {
       return workload;
     }
     return this.mActivityHelper.mConfigurations.getBenchmarkLoad();
@@ -109,12 +109,11 @@ public class BaseBMHelper {
    */
   public int getIterations() {
     String iters = properties.getProperty("iterations");
-    if(iters != null) {
+    if (iters != null) {
       return Integer.parseInt(iters.trim());
     }
     return this.mActivityHelper.mConfigurations.getIterationsCount();
   }
-
 
   /**
    * Get bm args string [ ].
@@ -124,7 +123,6 @@ public class BaseBMHelper {
   public String[] getBmArgs() {
     return null;
   }
-
 
   private PrintStream outPrintStream;
   private PrintStream errPrintStream;

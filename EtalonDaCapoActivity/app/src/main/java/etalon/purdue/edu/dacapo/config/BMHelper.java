@@ -8,7 +8,6 @@ import etalon.purdue.edu.base.BaseBMHelper;
  */
 public class BMHelper extends BaseBMHelper {
 
-
   /**
    * The Data path.
    */
@@ -25,8 +24,6 @@ public class BMHelper extends BaseBMHelper {
 
     dataPath = mActivityHelper.mConfigurations.getAppDataPath(appName);
   }
-
-
 
   @Override
   public String[] getBmArgs() {

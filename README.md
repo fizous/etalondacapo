@@ -9,4 +9,4 @@ Since some Java libraries are not fully supported on Android and some others pac
 
 The port is intended to be generic, and configurable to serve as a tool for Mobile benchmarking by the system developers.
 
-![MacDown Screenshot](http://d.pr/i/10UGP+)
+![DaCapo Screenshot](https://github.com/fizous/etalondacapo/blob/master/screen_shot.png)

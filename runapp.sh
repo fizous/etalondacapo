@@ -10,5 +10,5 @@ echo -e "devices connected....."
 adb devices
  
 adb shell mkdir -p /sdcard/benchmarks/dacapo
-adb push $SCRIPT_DIR/data /sdcard/benchmarks/etalonjson/
-adb install $SCRIPT_DIR/etalon-json.apk
+adb push $SCRIPT_DIR/data /sdcard/benchmarks/dacapo/
+adb install $SCRIPT_DIR/etalon-dacapo.apk

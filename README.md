@@ -7,6 +7,9 @@ Since some Java libraries are not fully supported on Android and some others pac
 		3. pmd
 		4. hsqldb (sqlite)
 
+hsqldb is modified to use Android sqlite library based on the interface described in
+[dmytrodanylyk](https://github.com/dmytrodanylyk/android-concurrent-database).
+
 The port is intended to be generic, and configurable to serve as a tool for Mobile benchmarking by the system developers.
 
 ![DaCapo Screenshot](screen_shot.png)
@@ -16,7 +19,7 @@ Unlike all the other mobile benchmarks, this benchmark suite focuses on high lev
 The ability to execute deterministic workload without environmental effect (GPS, WiFI, etc..) allows the system developers to analyse the main system performance.
 
 ### Running
-From command line execute: 
+From command line execute:
 
 ~~~shell
 ./runapp.sh
@@ -26,13 +29,14 @@ The script takes care of copying the data folder to the external storage of the 
 
 ## Related Publications
 
-* Hussein, A., Payer, M., Hosking, A. L., and Vick, C. A. (2015). Impact of GC Design on Power and Performance for Android. *In ACM International Systems and Storage Conference*. doi:10.1145/2757667.2757674.
-* Hussein, A., Hosking, A. L., Payer, M., and Vick, C. A. (2015). Don’t Race the Memory Bus: Taming the GC Leadfoot. *In ACM SIGPLAN International Symposium on Memory Management*. doi:10.1145/2754169.2754182
+* **One Process to Reap Them All: Garbage Collection as-a-Service**. Ahmed Hussein, Mathias Payer, Antony L. Hosking, and Chris Vick. (2017). *In proceedings of the 13th ACM SIGPLAN/SIGOPS International Conference on Virtual Execution Environments (VEE’17). Xi’an, China*. doi:[10.1145/3050748.3050754](https://doi.org/10.1145/3140607.3050754).
+* **Impact of GC Design on Power and Performance for Android**. Ahmed Hussein, Mathias Payer, Antony Hosking, and Christopher A. Vick. (2015).  *In ACM International Systems and Storage Conference*. doi:[10.1145/2757667.2757674](https://doi.org/10.1145/2757667.2757674).
+* **Don’t Race the Memory Bus: Taming the GC Leadfoot**. Ahmed Hussein, Antony L. Hosking, Mathias Payer, and Christopher A. Vick. (2015).  *In ACM SIGPLAN International Symposium on Memory Management*. doi:[10.1145/2754169.2754182](https://doi.org/10.1145/2887746.2754182)
 
 ## License
 
 ```
-Copyright 2016 Purdue University.
+Copyright 2011, 2018 Purdue University.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

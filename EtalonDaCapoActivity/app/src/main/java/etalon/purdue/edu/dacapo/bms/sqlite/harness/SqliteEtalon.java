@@ -7,7 +7,7 @@
  *    http://www.opensource.org/licenses/apache2.0.php
  *
  * Modifications copyright (C) 2011, 2018 Purdue University
- * Refactor the code to use load the Android application
+ * Refactor the code to use sqlite android library
  */
 package etalon.purdue.edu.dacapo.bms.sqlite.harness;
 

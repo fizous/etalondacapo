@@ -7,8 +7,8 @@ Since some Java libraries are not fully supported on Android and some others pac
 		3. pmd
 		4. hsqldb (sqlite)
 
-hsqldb is modified to use Android sqlite library based on the interface described in
-[dmytrodanylyk](https://github.com/dmytrodanylyk/android-concurrent-database).
+`hsqldb` is modified to use Android sqlite library based on the interface described in
+[dmytrodanylyk](https://github.com/dmytrodanylyk/android-concurrent-database) code repo.
 
 The port is intended to be generic, and configurable to serve as a tool for Mobile benchmarking by the system developers.
 
@@ -25,7 +25,23 @@ From command line execute:
 ./runapp.sh
 ~~~
 
-The script takes care of copying the data folder to the external storage of the device as well as installing the apk file.
+The script takes care of copying the data folder to the external storage of the
+ device as well as installing the apk file.
+
+### Configuring
+
+The benchmark can be configured by modifying the contents of the xml file
+`data/app_conf.xml`
+
+Field            | Usage                               |  
+-----------------|-------------------------------------|
+speed            | defines the load of the benchmark. Currently there are three different loads (smallest workload00).                 |  
+iterations       | number of iterations in each execution  |  
+inner_iterations | The warmup iterations. they will be excluded from the report|
+button labels    |  define the label displayed on each button  |
+action button    | uses java reflection to dynamically load the java class and attach it the given button listener  |
+
+In addition, there is a configuration file for each application `data/app_name/conf.xml`
 
 ## Related Publications
 

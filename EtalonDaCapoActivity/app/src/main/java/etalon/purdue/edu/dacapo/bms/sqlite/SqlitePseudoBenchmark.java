@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2005, 2009 The Australian National University.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License v2.0.
+ * You may obtain the license at
+ *
+ *    http://www.opensource.org/licenses/apache2.0.php
+ *
+ * Modifications copyright (C) 2011, 2018 Purdue University
+ * Refactor the code to use dbmodel
+ */
 package etalon.purdue.edu.dacapo.bms.sqlite;
 
 import android.content.Context;
@@ -119,11 +130,6 @@ public class SqlitePseudoBenchmark {
 //        }
 //        return dbConnection;
 //      }
-
-
-
-
-
 
       Connection conn = DriverManager.getConnection(DBUrl, DBUser,
           DBPassword);

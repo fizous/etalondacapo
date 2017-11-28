@@ -1,29 +1,37 @@
 # Android Etalon - DaCapo
-Etalon-DaCapo is a port of a set of [DaCapo Java Benchmark ](http://www.dacapobench.org/) to Android devices.
-Since some Java libraries are not fully supported on Android and some others packages are completely left out, we ported only four applications:
+Etalon-DaCapo is a port of a set of
+[DaCapo Java Benchmark ](http://www.dacapobench.org/) to Android devices.
+Since some Java libraries are not fully supported on Android and some others
+packages are completely left out, we ported only four applications:
 
 		1. lusearch
 		2. xalan
 		3. pmd
 		4. hsqldb (sqlite)
 
-`hsqldb` is modified to use Android sqlite library based on the interface described in
-[dmytrodanylyk](https://github.com/dmytrodanylyk/android-concurrent-database) code repo.
+`hsqldb` is modified to use Android sqlite library based on the interface
+described in
+[dmytrodanylyk](https://github.com/dmytrodanylyk/android-concurrent-database)
+code repo.
 
-The port is intended to be generic, and configurable to serve as a tool for Mobile benchmarking by the system developers.
+The port is intended to be generic, and configurable to serve as a tool for
+Mobile benchmarking by the system developers.
 
 ![DaCapo Screenshot](screen_shot.png)
 
 ## How this is useful?
-Unlike all the other mobile benchmarks, this benchmark suite focuses on high level performance of the runtime (Virtual Machine).
-The ability to execute deterministic workload without environmental effect (GPS, WiFI, etc..) allows the system developers to analyse the main system performance.
+Unlike all the other mobile benchmarks, this benchmark suite focuses on high
+level performance of the runtime (Virtual Machine).
+The ability to execute deterministic workload without environmental effect
+(GPS, WiFI, etc..) allows the system developers to analyze the main system
+performance.
 
 ### Running
 From command line execute:
 
-~~~shell
+```shell
 ./runapp.sh
-~~~
+```
 
 The script takes care of copying the data folder to the external storage of the
  device as well as installing the `apk` file located in the current directory.
@@ -41,7 +49,8 @@ inner_iterations | The warmup iterations. they will be excluded from the report|
 button labels    |  define the label displayed on each button  |
 action button    | uses java reflection to dynamically load the java class and attach it the given button listener  |
 
-In addition, there is a configuration file for each application `data/app_name/conf.xml`
+In addition, there is a configuration file for each application
+`data/app_name/conf.xml`
 
 ## Related Publications
 

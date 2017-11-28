@@ -26,7 +26,7 @@ From command line execute:
 ~~~
 
 The script takes care of copying the data folder to the external storage of the
- device as well as installing the apk file.
+ device as well as installing the `apk` file located in the current directory.
 
 ### Configuring
 
